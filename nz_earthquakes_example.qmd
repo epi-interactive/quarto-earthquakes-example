@@ -1,0 +1,104 @@
+---
+title: "NZ Earthquakes Example"
+author: "Your name here"
+date: "03/18/2025"
+format: 
+  revealjs:
+    theme: sky
+    embed-resources: true
+    smaller: true
+    transition: slide
+    transition-speed: fast
+    title-slide-attributes: 
+      data-background-image: "https://app.rippledna.com/img/background.png"
+    logo: "https://epi-interactive.com/_resources/themes/epi/img/Logo_icon.svg"
+execute:
+  warning: false
+  message: false
+  echo: false
+params:
+  year: 2024 # between 2024 & 2025
+  region: "Waikato Region" # Should be a character string ending in " Region"
+  magnitude_range: [2,8] # Should be array [x,y]
+editor: source
+---
+
+
+```{r setup}
+#| include: true
+#| output: false
+
+
+library(feather)
+library(ggplot2)
+library(maps)
+library(dplyr)
+library(knitr)
+library(gt)
+
+nz_map <- map_data("world2", region = "New Zealand")
+g_nz_map_ggplot <- ggplot() + geom_polygon(data = nz_map,
+                                           aes(x = long, y = lat, group = group),
+                                           fill = "#008552") 
+
+# Read the eq data here
+eq_data <- feather::read_feather("data/earthquakes.feather")
+
+# create filter values 
+filter_year <- params$year
+filter_region <- params$region
+filter_mag_range <- params$magnitude_range
+
+
+eq_data_filtered <- eq_data
+
+# only filter if our parameters are actually set to a meaningful value
+if(!is.null(filter_year)) {
+  eq_data_filtered <- dplyr::filter(eq_data_filtered, year == filter_year)
+}
+if(!is.null(filter_region)) {
+  eq_data_filtered <- dplyr::filter(eq_data_filtered, region == filter_region)
+}
+if(!is.null(filter_mag_range)) {
+  eq_data_filtered <- dplyr::filter(eq_data_filtered, dplyr::between(magnitude, 
+                                                                     filter_mag_range[1], 
+                                                                     filter_mag_range[2]))
+}
+
+summary(eq_data_filtered)
+
+```
+
+
+This example document demonstrates how to load and preprocess data from a CSV file, and then plot the data on a map of New Zealand. The data consists of earthquake events in New Zealand, and includes information such as the origin time, location, and magnitude of each event.
+
+![Map of New Zealand Faultlines](www/faultlines_nz.png){width="100%"}
+
+
+
+## Report summary
+
+| Parameter               | Value                                       |
+|-------------------------|---------------------------------------------|
+| Year                    | `{r} filter_year`                             |
+| Region                  | `{r} filter_region`                           |
+| Magnitude range         | `{r} paste(filter_mag_range, collapse = "-")` |
+| Rows in filtered data   | `{r} nrow(eq_data_filtered)`                  |
+| Rows excluded from data | `{r} nrow(eq_data) - nrow(eq_data_filtered)`  |
+
+## Summary of filtered data
+
+This document contains data for earthquakes in New Zealand in the year 2024. During this time period, there were a total of `r nrow(eq_data_filtered)` earthquakes recorded, with a minimum magnitude of `r min(eq_data_filtered$magnitude)`, a maximum magnitude of `r max(eq_data_filtered$magnitude)`, and an average magnitude of `r mean(eq_data_filtered$magnitude)`. On average, there were `r nrow(eq_data_filtered) / 12` earthquakes per month.
+
+This document provides an analysis of the earthquake data, including frequency over time, a map of earthquake locations, a histogram of earthquake magnitudes, and a scatter plot of magnitude vs. depth.
+
+------------------------------------------------------------------------
+
+{{< include includes/_plot_map.qmd >}}
+
+{{< include includes/_table_monthly.qmd >}}
+
+{{< include includes/_plot_hist.qmd >}}
+
+{{< include includes/_plot_magnitude_depth_origin.qmd >}}
+

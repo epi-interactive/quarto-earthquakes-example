@@ -1,0 +1,14 @@
+## Magnitude and depth by origin
+
+. . .
+
+```{r plot_magnitude_depth_origin}
+
+eq_data_filtered %>%
+  filter(!is.na(origin)) %>%
+  ggplot(aes(x = magnitude, y = depth, col = origin)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", col = "red") +
+  labs(title = "Magnitude vs Depth by Origin", x = "Magnitude", y = "Depth (km)")
+
+```

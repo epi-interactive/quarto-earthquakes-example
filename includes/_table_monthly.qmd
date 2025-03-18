@@ -1,0 +1,16 @@
+## Table of earthquake summary statistics per month in filtered data
+
+. . .
+
+```{r table_monthly}
+
+# create a table of earthquake summary statistics per month
+monthly_summary <- eq_data_filtered %>%
+  group_by(year, month_label) %>%
+  summarise(total_events = n(),
+            min_magnitude = min(magnitude),
+            max_magnitude = max(magnitude),
+            avg_magnitude = mean(magnitude))
+
+gt::gt(monthly_summary)
+```

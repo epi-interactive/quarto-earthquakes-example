@@ -1,0 +1,16 @@
+
+## Map of Earthquakes in New Zealand in filtered data
+
+. . .
+
+```{r plot_map}
+
+g_nz_map_ggplot +
+  # colour points by recency (year and month)
+  geom_point(data = eq_data_filtered, aes(x = longitude, y = latitude, color = year_month_numeric, alpha = 0.8), size = 0.5) +
+  scale_y_continuous(limits = c(-51, -30)) +
+  scale_x_continuous(limits = c(160, 185)) +
+  theme_minimal() + 
+  scale_color_gradientn(name = "Recency", colours = c("purple", "maroon"), breaks = NULL) + 
+  guides(alpha = FALSE)
+```

@@ -1,0 +1,12 @@
+## Histogram of Earthquakes by magnitude in filtered data
+
+. . .
+
+```{r plot_hist}
+
+ggplot(eq_data_filtered, aes(x = magnitude)) +
+  geom_histogram(fill = "#008552", color = "black", bins = 20) +
+  scale_y_log10() +
+  theme_minimal()
+
+```
